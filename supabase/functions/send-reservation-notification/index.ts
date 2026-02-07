@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -10,13 +11,26 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface ReservationRequest {
-  offerId: string;
-  subscriberName: string;
-  subscriberEmail: string;
-  subscriberPhone?: string;
-  message?: string;
-}
+// Input validation schema
+const ReservationRequestSchema = z.object({
+  offerId: z.string().uuid("Invalid offer ID format"),
+  subscriberName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name too long").trim(),
+  subscriberEmail: z.string().email("Invalid email format").max(255, "Email too long"),
+  subscriberPhone: z.string().max(20, "Phone number too long").optional().transform(val => val?.trim()),
+  message: z.string().max(1000, "Message too long").optional().transform(val => val?.trim()),
+});
+
+type ReservationRequest = z.infer<typeof ReservationRequestSchema>;
+
+// HTML escape function to prevent injection in emails
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -50,12 +64,26 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("User not authenticated");
     }
 
-    const { offerId, subscriberName, subscriberEmail, subscriberPhone, message }: ReservationRequest = await req.json();
-
-    // Validate required fields
-    if (!offerId || !subscriberName || !subscriberEmail) {
-      throw new Error("Missing required fields: offerId, subscriberName, subscriberEmail");
+    // Parse and validate input
+    let validatedData: ReservationRequest;
+    try {
+      const requestBody = await req.json();
+      validatedData = ReservationRequestSchema.parse(requestBody);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
+        return new Response(
+          JSON.stringify({ error: "Invalid input", details: error.errors }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      throw error;
     }
+
+    const { offerId, subscriberName, subscriberEmail, subscriberPhone, message } = validatedData;
 
     // Get offer details
     const { data: offer, error: offerError } = await supabaseAdmin
@@ -133,22 +161,22 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="margin: 10px 0 0 0; opacity: 0.9;">Has recibido una reserva para tu oferta</p>
             </div>
             <div class="content">
-              <p>Hola <strong>${publisherName}</strong>,</p>
+              <p>Hola <strong>${escapeHtml(publisherName)}</strong>,</p>
               <p>Un suscriptor ha mostrado interés en tu oferta:</p>
               
               <div class="offer-card">
-                <h3 style="margin: 0 0 10px 0;">${offer.title}</h3>
+                <h3 style="margin: 0 0 10px 0;">${escapeHtml(offer.title)}</h3>
                 <p class="price">${offer.price.toFixed(2)}€</p>
-                <p style="margin: 5px 0;"><strong>Tienda:</strong> ${offer.store_name}</p>
-                <p style="margin: 5px 0;"><strong>Población:</strong> ${offer.town}</p>
+                <p style="margin: 5px 0;"><strong>Tienda:</strong> ${escapeHtml(offer.store_name)}</p>
+                <p style="margin: 5px 0;"><strong>Población:</strong> ${escapeHtml(offer.town)}</p>
               </div>
               
               <div class="subscriber-info">
                 <h3 style="margin: 0 0 15px 0;">📧 Datos del interesado</h3>
-                <p><span class="label">Nombre:</span> ${subscriberName}</p>
-                <p><span class="label">Email:</span> <a href="mailto:${subscriberEmail}">${subscriberEmail}</a></p>
-                ${subscriberPhone ? `<p><span class="label">Teléfono:</span> <a href="tel:${subscriberPhone}">${subscriberPhone}</a></p>` : ""}
-                ${message ? `<p><span class="label">Mensaje:</span></p><p style="background: #f0f0f0; padding: 15px; border-radius: 8px;">${message}</p>` : ""}
+                <p><span class="label">Nombre:</span> ${escapeHtml(subscriberName)}</p>
+                <p><span class="label">Email:</span> <a href="mailto:${encodeURIComponent(subscriberEmail)}">${escapeHtml(subscriberEmail)}</a></p>
+                ${subscriberPhone ? `<p><span class="label">Teléfono:</span> <a href="tel:${encodeURIComponent(subscriberPhone)}">${escapeHtml(subscriberPhone)}</a></p>` : ""}
+                ${message ? `<p><span class="label">Mensaje:</span></p><p style="background: #f0f0f0; padding: 15px; border-radius: 8px;">${escapeHtml(message)}</p>` : ""}
               </div>
               
               <p style="margin-top: 20px;">Te recomendamos ponerte en contacto con el interesado lo antes posible.</p>
