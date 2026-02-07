@@ -102,49 +102,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string, name: string, town: string, role: AppRole) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { data, error } = await supabase.auth.signUp({
+    // Pass user data as metadata - the database trigger will create profile/role
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: redirectUrl,
+        data: {
+          name,
+          town,
+          role
+        }
       }
     });
 
     if (error) return { error };
-    if (!data.user) return { error: new Error('No se pudo crear el usuario') };
-
-    // Create profile
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        user_id: data.user.id,
-        name,
-        town
-      });
-
-    if (profileError) return { error: profileError };
-
-    // Create user role
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .insert({
-        user_id: data.user.id,
-        role
-      });
-
-    if (roleError) return { error: roleError };
-
-    // If subscriber, create default subscription
-    if (role === 'SUSCRIPTOR') {
-      await supabase
-        .from('subscriptions')
-        .insert({
-          user_id: data.user.id,
-          town,
-          categories: []
-        });
-    }
-
+    
     return { error: null };
   };
 
