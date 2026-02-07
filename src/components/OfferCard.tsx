@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Store, Phone, Calendar, Clock, ShoppingBag } from 'lucide-react';
-import { getCategoryLabel, getCategoryColor } from '@/lib/constants';
+import { MapPin, Store, Phone, Calendar, Clock, ShoppingBag, Ruler } from 'lucide-react';
+import { getCategoryLabel, getCategoryColor, requiresSize } from '@/lib/constants';
 import { format, isPast, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -18,6 +18,7 @@ export interface Offer {
   image_url?: string | null;
   expires_at?: string | null;
   created_at: string;
+  size?: string | null;
 }
 
 interface OfferCardProps {
@@ -62,6 +63,17 @@ export function OfferCard({ offer, onClick, onReserve, showReserveButton = false
         >
           {getCategoryLabel(offer.category)}
         </Badge>
+
+        {/* Size Badge */}
+        {offer.size && requiresSize(offer.category) && (
+          <Badge 
+            variant="secondary"
+            className="absolute top-3 left-24"
+          >
+            <Ruler className="h-3 w-3 mr-1" />
+            {offer.size}
+          </Badge>
+        )}
 
         {/* Expired Badge */}
         {isExpired && (
