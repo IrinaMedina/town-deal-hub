@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Loader2, Pencil, Trash2, MapPin, Store, Clock, AlertCircle, Plus, Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { CATEGORIES, getCategoryLabel, getCategoryColor } from '@/lib/constants';
+import { CATEGORIES, getCategoryLabel, getCategoryColor, requiresSize, getSizesForCategory } from '@/lib/constants';
 import { format, isPast, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -30,6 +30,7 @@ interface Offer {
   image_url: string | null;
   expires_at: string | null;
   created_at: string;
+  size: string | null;
 }
 
 export default function MyOffers() {
@@ -157,6 +158,7 @@ export default function MyOffers() {
           contact: editingOffer.contact,
           expires_at: editingOffer.expires_at,
           image_url: imageUrl,
+          size: requiresSize(editingOffer.category) ? editingOffer.size : null,
         })
         .eq('id', editingOffer.id);
 
@@ -367,7 +369,11 @@ export default function MyOffers() {
                   <Label>Categoría</Label>
                   <Select
                     value={editingOffer.category}
-                    onValueChange={value => setEditingOffer({ ...editingOffer, category: value })}
+                    onValueChange={value => setEditingOffer({ 
+                      ...editingOffer, 
+                      category: value,
+                      size: requiresSize(value) ? editingOffer.size : null 
+                    })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -382,6 +388,39 @@ export default function MyOffers() {
                   </Select>
                 </div>
 
+                {requiresSize(editingOffer.category) ? (
+                  <div className="space-y-2">
+                    <Label>Talla</Label>
+                    <Select
+                      value={editingOffer.size || ''}
+                      onValueChange={value => setEditingOffer({ ...editingOffer, size: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getSizesForCategory(editingOffer.category).map(size => (
+                          <SelectItem key={size} value={size}>
+                            {size}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Precio (€)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={editingOffer.price}
+                      onChange={e => setEditingOffer({ ...editingOffer, price: parseFloat(e.target.value) || 0 })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {requiresSize(editingOffer.category) && (
                 <div className="space-y-2">
                   <Label>Precio (€)</Label>
                   <Input
@@ -391,7 +430,7 @@ export default function MyOffers() {
                     onChange={e => setEditingOffer({ ...editingOffer, price: parseFloat(e.target.value) || 0 })}
                   />
                 </div>
-              </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

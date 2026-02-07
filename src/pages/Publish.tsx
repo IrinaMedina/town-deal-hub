@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, X, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { CATEGORIES } from '@/lib/constants';
+import { CATEGORIES, requiresSize, getSizesForCategory } from '@/lib/constants';
 import { z } from 'zod';
 
 const offerSchema = z.object({
@@ -43,6 +43,7 @@ export default function Publish() {
     store_name: '',
     contact: '',
     expires_at: '',
+    size: '',
   });
 
   useEffect(() => {
@@ -60,7 +61,14 @@ export default function Publish() {
   }, [profile]);
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      // Clear size if category changes to one that doesn't need it
+      if (field === 'category' && !requiresSize(value)) {
+        updated.size = '';
+      }
+      return updated;
+    });
     setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
@@ -154,6 +162,7 @@ export default function Publish() {
           expires_at: formData.expires_at || null,
           image_url: imageUrl,
           created_by: user!.id,
+          size: requiresSize(formData.category) ? formData.size || null : null,
         });
 
       if (error) throw error;
@@ -173,6 +182,7 @@ export default function Publish() {
         store_name: '',
         contact: '',
         expires_at: '',
+        size: '',
       });
       setImageFile(null);
       setImagePreview(null);
@@ -280,6 +290,28 @@ export default function Publish() {
                   )}
                 </div>
               </div>
+
+              {/* Size (conditional) */}
+              {requiresSize(formData.category) && (
+                <div className="space-y-2">
+                  <Label>Talla</Label>
+                  <Select
+                    value={formData.size}
+                    onValueChange={value => handleChange('size', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar talla" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getSizesForCategory(formData.category).map(size => (
+                        <SelectItem key={size} value={size}>
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Price & Store */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

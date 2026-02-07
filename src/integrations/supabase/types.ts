@@ -25,6 +25,7 @@ export type Database = {
           id: string
           image_url: string | null
           price: number
+          size: string | null
           store_name: string
           title: string
           town: string
@@ -39,6 +40,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           price: number
+          size?: string | null
           store_name: string
           title: string
           town: string
@@ -53,6 +55,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           price?: number
+          size?: string | null
           store_name?: string
           title?: string
           town?: string
