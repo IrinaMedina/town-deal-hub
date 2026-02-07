@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Store, Phone, Calendar, Clock, ShoppingBag, Ruler } from 'lucide-react';
+import { MapPin, Store, Phone, Calendar, Clock, ShoppingBag, Ruler, Star } from 'lucide-react';
 import { getCategoryLabel, getCategoryColor, requiresSize } from '@/lib/constants';
 import { format, isPast, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -19,6 +19,9 @@ export interface Offer {
   expires_at?: string | null;
   created_at: string;
   size?: string | null;
+  created_by?: string;
+  publisher_rating?: number | null;
+  publisher_rating_count?: number;
 }
 
 interface OfferCardProps {
@@ -118,6 +121,15 @@ export function OfferCard({ offer, onClick, onReserve, showReserveButton = false
             <Phone className="h-4 w-4 text-primary/70" />
             <span className="truncate">{offer.contact}</span>
           </div>
+          {offer.publisher_rating && offer.publisher_rating > 0 && (
+            <div className="flex items-center gap-2">
+              <Star className="h-4 w-4 text-primary fill-primary" />
+              <div className="flex items-center gap-1">
+                <span className="font-medium">{offer.publisher_rating.toFixed(1)}</span>
+                <span className="text-xs">({offer.publisher_rating_count} valoraciones)</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Reserve Button */}
