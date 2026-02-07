@@ -1,29 +1,39 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Store, Phone, Calendar, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Store, Phone, Calendar, Clock, ShoppingBag } from 'lucide-react';
 import { getCategoryLabel, getCategoryColor } from '@/lib/constants';
 import { format, isPast, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-interface OfferCardProps {
-  offer: {
-    id: string;
-    title: string;
-    description?: string | null;
-    category: string;
-    town: string;
-    price: number;
-    store_name: string;
-    contact: string;
-    image_url?: string | null;
-    expires_at?: string | null;
-    created_at: string;
-  };
-  onClick?: () => void;
+export interface Offer {
+  id: string;
+  title: string;
+  description?: string | null;
+  category: string;
+  town: string;
+  price: number;
+  store_name: string;
+  contact: string;
+  image_url?: string | null;
+  expires_at?: string | null;
+  created_at: string;
 }
 
-export function OfferCard({ offer, onClick }: OfferCardProps) {
+interface OfferCardProps {
+  offer: Offer;
+  onClick?: () => void;
+  onReserve?: (offer: Offer) => void;
+  showReserveButton?: boolean;
+}
+
+export function OfferCard({ offer, onClick, onReserve, showReserveButton = false }: OfferCardProps) {
   const isExpired = offer.expires_at && isPast(parseISO(offer.expires_at));
+  
+  const handleReserve = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onReserve?.(offer);
+  };
   
   return (
     <Card 
@@ -97,6 +107,18 @@ export function OfferCard({ offer, onClick }: OfferCardProps) {
             <span className="truncate">{offer.contact}</span>
           </div>
         </div>
+
+        {/* Reserve Button */}
+        {showReserveButton && !isExpired && (
+          <Button 
+            className="w-full mt-3" 
+            size="sm"
+            onClick={handleReserve}
+          >
+            <ShoppingBag className="h-4 w-4 mr-2" />
+            Reservar
+          </Button>
+        )}
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-4 pt-3 border-t text-xs text-muted-foreground">
