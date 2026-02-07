@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2, Pencil, Trash2, MapPin, Store, Clock, AlertCircle, Plus } from 'lucide-react';
+import { Loader2, Pencil, Trash2, MapPin, Store, Clock, AlertCircle, Plus, Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CATEGORIES, getCategoryLabel, getCategoryColor } from '@/lib/constants';
 import { format, isPast, parseISO } from 'date-fns';
@@ -42,6 +42,8 @@ export default function MyOffers() {
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
   const [deletingOffer, setDeletingOffer] = useState<Offer | null>(null);
   const [saving, setSaving] = useState(false);
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,38 +78,102 @@ export default function MyOffers() {
     setLoading(false);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'Imagen muy grande',
+          description: 'El tamaño máximo es 5MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setNewImageFile(file);
+      setNewImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeNewImage = () => {
+    setNewImageFile(null);
+    setNewImagePreview(null);
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!newImageFile) return null;
+
+    const fileExt = newImageFile.name.split('.').pop();
+    const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
+
+    const { error } = await supabase.storage
+      .from('offer-images')
+      .upload(fileName, newImageFile);
+
+    if (error) {
+      throw new Error('Error al subir la imagen');
+    }
+
+    const { data } = supabase.storage
+      .from('offer-images')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  };
+
+  const openEditDialog = (offer: Offer) => {
+    setEditingOffer(offer);
+    setNewImageFile(null);
+    setNewImagePreview(null);
+  };
+
+  const closeEditDialog = () => {
+    setEditingOffer(null);
+    setNewImageFile(null);
+    setNewImagePreview(null);
+  };
+
   const handleEdit = async () => {
     if (!editingOffer) return;
     
     setSaving(true);
 
-    const { error } = await supabase
-      .from('offers')
-      .update({
-        title: editingOffer.title,
-        description: editingOffer.description,
-        category: editingOffer.category as "OUTLET_ROPA" | "OUTLET_TECNO" | "OUTLET_HOGAR" | "OUTLET_ZAPATOS" | "OUTLET_BELLEZA" | "OTROS",
-        town: editingOffer.town,
-        price: editingOffer.price,
-        store_name: editingOffer.store_name,
-        contact: editingOffer.contact,
-        expires_at: editingOffer.expires_at,
-      })
-      .eq('id', editingOffer.id);
+    try {
+      let imageUrl = editingOffer.image_url;
+      
+      // Upload new image if selected
+      if (newImageFile) {
+        imageUrl = await uploadImage();
+      }
 
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'No se pudo actualizar la oferta',
-        variant: 'destructive',
-      });
-    } else {
+      const { error } = await supabase
+        .from('offers')
+        .update({
+          title: editingOffer.title,
+          description: editingOffer.description,
+          category: editingOffer.category as "OUTLET_ROPA" | "OUTLET_TECNO" | "OUTLET_HOGAR" | "OUTLET_ZAPATOS" | "OUTLET_BELLEZA" | "OTROS",
+          town: editingOffer.town,
+          price: editingOffer.price,
+          store_name: editingOffer.store_name,
+          contact: editingOffer.contact,
+          expires_at: editingOffer.expires_at,
+          image_url: imageUrl,
+        })
+        .eq('id', editingOffer.id);
+
+      if (error) throw error;
+
       toast({
         title: '¡Actualizada!',
         description: 'La oferta ha sido modificada',
       });
       fetchOffers();
-      setEditingOffer(null);
+      closeEditDialog();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo actualizar la oferta',
+        variant: 'destructive',
+      });
     }
 
     setSaving(false);
@@ -244,7 +310,7 @@ export default function MyOffers() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingOffer(offer)}
+                          onClick={() => openEditDialog(offer)}
                         >
                           <Pencil className="h-4 w-4 mr-2" />
                           Editar
@@ -268,7 +334,7 @@ export default function MyOffers() {
       </main>
 
       {/* Edit Dialog */}
-      <Dialog open={!!editingOffer} onOpenChange={() => setEditingOffer(null)}>
+      <Dialog open={!!editingOffer} onOpenChange={closeEditDialog}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Oferta</DialogTitle>
@@ -355,19 +421,73 @@ export default function MyOffers() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Expiración</Label>
+                  <Label>Fecha expiración</Label>
                   <Input
                     type="date"
-                    value={editingOffer.expires_at || ''}
+                    value={editingOffer.expires_at ? editingOffer.expires_at.split('T')[0] : ''}
                     onChange={e => setEditingOffer({ ...editingOffer, expires_at: e.target.value || null })}
+                    min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
+              </div>
+
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label>Imagen</Label>
+                {newImagePreview ? (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={newImagePreview}
+                      alt="Nueva imagen"
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={removeNewImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : editingOffer.image_url ? (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={editingOffer.image_url}
+                      alt="Imagen actual"
+                      className="w-full h-full object-cover"
+                      crossOrigin="anonymous"
+                    />
+                    <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                      <Upload className="h-8 w-8 text-white mb-2" />
+                      <span className="text-sm text-white">Cambiar imagen</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <Upload className="h-6 w-6 text-muted-foreground mb-1" />
+                    <span className="text-sm text-muted-foreground">Subir imagen</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                )}
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingOffer(null)}>
+            <Button variant="outline" onClick={closeEditDialog}>
               Cancelar
             </Button>
             <Button onClick={handleEdit} disabled={saving}>
