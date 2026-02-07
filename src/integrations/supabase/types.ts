@@ -86,6 +86,44 @@ export type Database = {
         }
         Relationships: []
       }
+      ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          publisher_id: string
+          rating: number
+          reservation_id: string
+          subscriber_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          publisher_id: string
+          rating: number
+          reservation_id: string
+          subscriber_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          publisher_id?: string
+          rating?: number
+          reservation_id?: string
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: true
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reservations: {
         Row: {
           created_at: string

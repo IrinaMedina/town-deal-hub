@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, Tag, PlusCircle, List, Settings } from 'lucide-react';
+import { Menu, LogOut, Tag, PlusCircle, List, Settings, Inbox, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 
 export function Navbar() {
@@ -32,6 +32,16 @@ export function Navbar() {
           >
             <Tag className="h-4 w-4" />
             Feed
+          </Link>
+          <Link
+            to="/my-reservations"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/my-reservations') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <ShoppingBag className="h-4 w-4" />
+            Mis Reservas
           </Link>
           <Link
             to="/subscription"
@@ -66,6 +76,16 @@ export function Navbar() {
           >
             <List className="h-4 w-4" />
             Mis Ofertas
+          </Link>
+          <Link
+            to="/reservations"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/reservations') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <Inbox className="h-4 w-4" />
+            Reservas
           </Link>
         </>
       )}

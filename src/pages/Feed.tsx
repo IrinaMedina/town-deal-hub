@@ -103,9 +103,44 @@ export default function Feed() {
         description: 'No se pudieron cargar las ofertas',
         variant: 'destructive',
       });
-    } else {
-      setOffers(data || []);
+      return;
     }
+
+    if (!data || data.length === 0) {
+      setOffers([]);
+      return;
+    }
+
+    // Get unique publisher IDs
+    const publisherIds = [...new Set(data.map(o => o.created_by))];
+
+    // Fetch ratings for these publishers
+    const { data: ratingsData } = await supabase
+      .from('ratings')
+      .select('publisher_id, rating')
+      .in('publisher_id', publisherIds);
+
+    // Calculate average rating per publisher
+    const publisherRatings = new Map<string, { total: number; count: number }>();
+    ratingsData?.forEach(r => {
+      const existing = publisherRatings.get(r.publisher_id) || { total: 0, count: 0 };
+      publisherRatings.set(r.publisher_id, {
+        total: existing.total + r.rating,
+        count: existing.count + 1,
+      });
+    });
+
+    // Enrich offers with publisher ratings
+    const enrichedOffers = data.map(offer => {
+      const ratingData = publisherRatings.get(offer.created_by);
+      return {
+        ...offer,
+        publisher_rating: ratingData ? ratingData.total / ratingData.count : null,
+        publisher_rating_count: ratingData?.count || 0,
+      };
+    });
+
+    setOffers(enrichedOffers);
   };
 
   if (authLoading || loading) {
