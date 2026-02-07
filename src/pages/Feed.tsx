@@ -3,26 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { OfferCard } from '@/components/OfferCard';
+import { OfferCard, type Offer } from '@/components/OfferCard';
+import { ReservationDialog } from '@/components/ReservationDialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Loader2, Settings, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface Offer {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string;
-  town: string;
-  price: number;
-  store_name: string;
-  contact: string;
-  image_url: string | null;
-  expires_at: string | null;
-  created_at: string;
-}
 
 interface Subscription {
   town: string;
@@ -38,6 +25,13 @@ export default function Feed() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [onlyActive, setOnlyActive] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
+
+  const handleReserve = (offer: Offer) => {
+    setSelectedOffer(offer);
+    setReservationDialogOpen(true);
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -191,11 +185,22 @@ export default function Feed() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {offers.map(offer => (
-              <OfferCard key={offer.id} offer={offer} />
+              <OfferCard 
+                key={offer.id} 
+                offer={offer} 
+                showReserveButton
+                onReserve={handleReserve}
+              />
             ))}
           </div>
         )}
       </main>
+
+      <ReservationDialog
+        offer={selectedOffer}
+        open={reservationDialogOpen}
+        onOpenChange={setReservationDialogOpen}
+      />
     </div>
   );
 }

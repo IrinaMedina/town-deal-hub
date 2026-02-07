@@ -83,6 +83,53 @@ export type Database = {
         }
         Relationships: []
       }
+      reservations: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          offer_id: string
+          status: string
+          subscriber_email: string
+          subscriber_id: string
+          subscriber_name: string
+          subscriber_phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          offer_id: string
+          status?: string
+          subscriber_email: string
+          subscriber_id: string
+          subscriber_name: string
+          subscriber_phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          offer_id?: string
+          status?: string
+          subscriber_email?: string
+          subscriber_id?: string
+          subscriber_name?: string
+          subscriber_phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           categories: Database["public"]["Enums"]["offer_category"][]
