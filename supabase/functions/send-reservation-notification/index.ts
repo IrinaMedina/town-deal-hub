@@ -219,7 +219,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-reservation-notification:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "No se pudo procesar la reserva. Inténtalo de nuevo." }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
