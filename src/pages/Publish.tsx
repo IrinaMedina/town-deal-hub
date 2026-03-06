@@ -13,6 +13,7 @@ import { Loader2, Upload, X, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CATEGORIES, requiresSize, getSizesForCategory } from '@/lib/constants';
 import { z } from 'zod';
+import { Captcha } from '@/components/Captcha';
 
 const offerSchema = z.object({
   title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
@@ -33,6 +34,7 @@ export default function Publish() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -411,7 +413,12 @@ export default function Publish() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <div className="space-y-2">
+                <Label>Verificación de seguridad</Label>
+                <Captcha onVerified={setCaptchaVerified} />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading || !captchaVerified}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
