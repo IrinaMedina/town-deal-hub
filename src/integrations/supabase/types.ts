@@ -14,6 +14,136 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_images: {
+        Row: {
+          business_id: string
+          caption: string | null
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+        }
+        Insert: {
+          business_id: string
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+        }
+        Update: {
+          business_id?: string
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_images_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_reviews: {
+        Row: {
+          business_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+        }
+        Insert: {
+          business_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+        }
+        Update: {
+          business_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          address: string | null
+          category: Database["public"]["Enums"]["business_category"]
+          created_at: string
+          created_by: string
+          description: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          phone: string | null
+          rating_avg: number | null
+          rating_count: number | null
+          schedule: string | null
+          social_media: Json | null
+          town: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category: Database["public"]["Enums"]["business_category"]
+          created_at?: string
+          created_by: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          schedule?: string | null
+          social_media?: Json | null
+          town: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: Database["public"]["Enums"]["business_category"]
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          schedule?: string | null
+          social_media?: Json | null
+          town?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           category: Database["public"]["Enums"]["offer_category"]
@@ -237,7 +367,23 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "PUBLICADOR" | "SUSCRIPTOR"
+      app_role: "PUBLICADOR" | "SUSCRIPTOR" | "EMPRESA"
+      business_category:
+        | "GESTORIA"
+        | "ABOGADOS"
+        | "FONTANERIA"
+        | "ELECTRICIDAD"
+        | "DENTISTA"
+        | "MEDICO"
+        | "INFORMATICA"
+        | "PRL"
+        | "AUTOESCUELA"
+        | "PELUQUERIA_MUJER"
+        | "PELUQUERIA_HOMBRE"
+        | "VETERINARIA"
+        | "INMOBILIARIA"
+        | "RESTAURACION"
+        | "OTROS_SERVICIOS"
       offer_category:
         | "OUTLET_ROPA"
         | "OUTLET_TECNO"
@@ -372,7 +518,24 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["PUBLICADOR", "SUSCRIPTOR"],
+      app_role: ["PUBLICADOR", "SUSCRIPTOR", "EMPRESA"],
+      business_category: [
+        "GESTORIA",
+        "ABOGADOS",
+        "FONTANERIA",
+        "ELECTRICIDAD",
+        "DENTISTA",
+        "MEDICO",
+        "INFORMATICA",
+        "PRL",
+        "AUTOESCUELA",
+        "PELUQUERIA_MUJER",
+        "PELUQUERIA_HOMBRE",
+        "VETERINARIA",
+        "INMOBILIARIA",
+        "RESTAURACION",
+        "OTROS_SERVICIOS",
+      ],
       offer_category: [
         "OUTLET_ROPA",
         "OUTLET_TECNO",

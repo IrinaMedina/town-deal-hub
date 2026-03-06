@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, Tag, PlusCircle, List, Settings, Inbox, ShoppingBag } from 'lucide-react';
+import { Menu, LogOut, Tag, PlusCircle, List, Settings, Inbox, ShoppingBag, Building2, Search } from 'lucide-react';
 import { useState } from 'react';
 
 export function Navbar() {
@@ -21,6 +21,19 @@ export function Navbar() {
 
   const NavLinks = () => (
     <>
+      {/* Directory link for all logged users */}
+      {role && (
+        <Link
+          to="/directory"
+          onClick={() => setOpen(false)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive('/directory') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+          }`}
+        >
+          <Search className="h-4 w-4" />
+          Directorio
+        </Link>
+      )}
       {role === 'SUSCRIPTOR' && (
         <>
           <Link
@@ -88,6 +101,18 @@ export function Navbar() {
             Reservas
           </Link>
         </>
+      )}
+      {role === 'EMPRESA' && (
+        <Link
+          to="/my-business"
+          onClick={() => setOpen(false)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive('/my-business') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+          }`}
+        >
+          <Building2 className="h-4 w-4" />
+          Mi Empresa
+        </Link>
       )}
     </>
   );

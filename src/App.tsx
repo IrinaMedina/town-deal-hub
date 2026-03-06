@@ -12,6 +12,8 @@ import Publish from "./pages/Publish";
 import MyOffers from "./pages/MyOffers";
 import Reservations from "./pages/Reservations";
 import MyReservations from "./pages/MyReservations";
+import Directory from "./pages/Directory";
+import MyBusiness from "./pages/MyBusiness";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/my-offers" element={<MyOffers />} />
             <Route path="/reservations" element={<Reservations />} />
             <Route path="/my-reservations" element={<MyReservations />} />
+            <Route path="/directory" element={<Directory />} />
+            <Route path="/my-business" element={<MyBusiness />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

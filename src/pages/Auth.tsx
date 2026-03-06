@@ -19,7 +19,7 @@ const loginSchema = z.object({
 const registerSchema = loginSchema.extend({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   town: z.string().min(2, 'La población debe tener al menos 2 caracteres'),
-  role: z.enum(['PUBLICADOR', 'SUSCRIPTOR']),
+  role: z.enum(['PUBLICADOR', 'SUSCRIPTOR', 'EMPRESA']),
 });
 
 export default function Auth() {
@@ -31,7 +31,7 @@ export default function Auth() {
     password: '',
     name: '',
     town: '',
-    role: '' as 'PUBLICADOR' | 'SUSCRIPTOR' | '',
+    role: '' as 'PUBLICADOR' | 'SUSCRIPTOR' | 'EMPRESA' | '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [captchaVerified, setCaptchaVerified] = useState(false);
@@ -42,7 +42,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user && role) {
-      const redirectPath = role === 'PUBLICADOR' ? '/publish' : '/feed';
+      const redirectPath = role === 'PUBLICADOR' ? '/publish' : role === 'EMPRESA' ? '/my-business' : '/feed';
       navigate(redirectPath);
     }
   }, [user, role, navigate]);
@@ -88,7 +88,7 @@ export default function Auth() {
           formData.password,
           formData.name,
           formData.town,
-          formData.role as 'PUBLICADOR' | 'SUSCRIPTOR'
+          formData.role as 'PUBLICADOR' | 'SUSCRIPTOR' | 'EMPRESA'
         );
 
         if (error) {
@@ -211,6 +211,9 @@ export default function Auth() {
                       </SelectItem>
                       <SelectItem value="PUBLICADOR">
                         🏪 Publicador - Publico ofertas
+                      </SelectItem>
+                      <SelectItem value="EMPRESA">
+                        🏢 Empresa - Publicito mi negocio
                       </SelectItem>
                     </SelectContent>
                   </Select>
