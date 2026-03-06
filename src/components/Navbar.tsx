@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, Tag, PlusCircle, List, Settings, Inbox, ShoppingBag, Building2, Search } from 'lucide-react';
+import { Menu, LogOut, Tag, PlusCircle, List, Settings, Inbox, ShoppingBag, Building2, Search, Shield } from 'lucide-react';
 import { useState } from 'react';
 
 export function Navbar() {
@@ -143,6 +143,18 @@ export function Navbar() {
             Mensajes
           </Link>
         </>
+      )}
+      {role === 'ADMIN' && (
+        <Link
+          to="/admin"
+          onClick={() => setOpen(false)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive('/admin') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+          }`}
+        >
+          <Shield className="h-4 w-4" />
+          Admin
+        </Link>
       )}
     </>
   );

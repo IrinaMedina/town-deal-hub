@@ -100,6 +100,7 @@ export type Database = {
           rating_count: number | null
           schedule: string | null
           social_media: Json | null
+          status: string
           town: string
           trial_ends_at: string | null
           updated_at: string
@@ -120,6 +121,7 @@ export type Database = {
           rating_count?: number | null
           schedule?: string | null
           social_media?: Json | null
+          status?: string
           town: string
           trial_ends_at?: string | null
           updated_at?: string
@@ -140,6 +142,7 @@ export type Database = {
           rating_count?: number | null
           schedule?: string | null
           social_media?: Json | null
+          status?: string
           town?: string
           trial_ends_at?: string | null
           updated_at?: string
@@ -411,7 +414,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "PUBLICADOR" | "SUSCRIPTOR" | "EMPRESA"
+      app_role: "PUBLICADOR" | "SUSCRIPTOR" | "EMPRESA" | "ADMIN"
       business_category:
         | "GESTORIA"
         | "ABOGADOS"
@@ -562,7 +565,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["PUBLICADOR", "SUSCRIPTOR", "EMPRESA"],
+      app_role: ["PUBLICADOR", "SUSCRIPTOR", "EMPRESA", "ADMIN"],
       business_category: [
         "GESTORIA",
         "ABOGADOS",
