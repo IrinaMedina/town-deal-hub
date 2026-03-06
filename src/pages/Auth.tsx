@@ -207,13 +207,13 @@ export default function Auth() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="SUSCRIPTOR">
-                        🛒 Suscriptor - Busco ofertas
-                      </SelectItem>
-                      <SelectItem value="PUBLICADOR">
-                        🏪 Publicador - Publico ofertas
+                        👤 Usuario - Busco empresas y servicios
                       </SelectItem>
                       <SelectItem value="EMPRESA">
                         🏢 Empresa - Publicito mi negocio
+                      </SelectItem>
+                      <SelectItem value="PUBLICADOR">
+                        🏪 Tienda - Publico artículos y ofertas
                       </SelectItem>
                     </SelectContent>
                   </Select>

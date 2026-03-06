@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
 import { Input } from '@/components/ui/input';
@@ -27,8 +25,6 @@ interface Business {
 }
 
 export default function Directory() {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,12 +33,8 @@ export default function Directory() {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate('/auth');
-  }, [user, authLoading, navigate]);
-
-  useEffect(() => {
-    if (user) fetchBusinesses();
-  }, [user]);
+    fetchBusinesses();
+  }, []);
 
   const fetchBusinesses = async () => {
     setLoading(true);
@@ -63,9 +55,6 @@ export default function Directory() {
     return matchSearch && matchCategory;
   });
 
-  if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  }
 
   return (
     <div className="min-h-screen bg-background">
