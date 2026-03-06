@@ -21,19 +21,17 @@ export function Navbar() {
 
   const NavLinks = () => (
     <>
-      {/* Directory link for all logged users */}
-      {role && (
-        <Link
-          to="/directory"
-          onClick={() => setOpen(false)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive('/directory') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-          }`}
-        >
-          <Search className="h-4 w-4" />
-          Directorio
-        </Link>
-      )}
+      {/* Directory link for all users */}
+      <Link
+        to="/directory"
+        onClick={() => setOpen(false)}
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+          isActive('/directory') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+        }`}
+      >
+        <Search className="h-4 w-4" />
+        Directorio
+      </Link>
       {role === 'SUSCRIPTOR' && (
         <>
           <Link
