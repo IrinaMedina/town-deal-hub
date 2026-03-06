@@ -42,7 +42,7 @@ export function Navbar() {
             }`}
           >
             <Tag className="h-4 w-4" />
-            Feed
+            Ofertas
           </Link>
           <Link
             to="/my-reservations"
@@ -55,14 +55,14 @@ export function Navbar() {
             Mis Reservas
           </Link>
           <Link
-            to="/subscription"
+            to="/messages"
             onClick={() => setOpen(false)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-              isActive('/subscription') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+              isActive('/messages') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
             }`}
           >
-            <Settings className="h-4 w-4" />
-            Mi Suscripción
+            <Inbox className="h-4 w-4" />
+            Mensajes
           </Link>
         </>
       )}
@@ -101,16 +101,48 @@ export function Navbar() {
         </>
       )}
       {role === 'EMPRESA' && (
-        <Link
-          to="/my-business"
-          onClick={() => setOpen(false)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive('/my-business') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-          }`}
-        >
-          <Building2 className="h-4 w-4" />
-          Mi Empresa
-        </Link>
+        <>
+          <Link
+            to="/my-business"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/my-business') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <Building2 className="h-4 w-4" />
+            Mi Empresa
+          </Link>
+          <Link
+            to="/publish"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/publish') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <PlusCircle className="h-4 w-4" />
+            Publicar Ofertas
+          </Link>
+          <Link
+            to="/my-offers"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/my-offers') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <List className="h-4 w-4" />
+            Mis Ofertas
+          </Link>
+          <Link
+            to="/messages"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              isActive('/messages') ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+            }`}
+          >
+            <Inbox className="h-4 w-4" />
+            Mensajes
+          </Link>
+        </>
       )}
     </>
   );

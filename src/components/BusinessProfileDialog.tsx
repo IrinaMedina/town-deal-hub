@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, Phone, Mail, Globe, Clock, Star, Instagram, Facebook, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Clock, Star, Instagram, Facebook, Loader2, MessageCircle } from 'lucide-react';
 import { getBusinessCategoryLabel, getBusinessCategoryIcon } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Business {
   id: string;
@@ -51,6 +52,7 @@ interface Props {
 export function BusinessProfileDialog({ business, open, onClose, onReviewAdded }: Props) {
   const { user, role } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [images, setImages] = useState<BusinessImage[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -170,6 +172,26 @@ export function BusinessProfileDialog({ business, open, onClose, onReviewAdded }
               <span className="text-muted-foreground">({business.rating_count} valoraciones)</span>
             </div>
           )}
+        </div>
+
+        {/* Contact Button */}
+        <div className="pt-2">
+          <Button
+            className="w-full"
+            onClick={() => {
+              if (!user) {
+                toast({ title: 'Inicia sesión para contactar', description: 'Necesitas una cuenta para enviar mensajes.' });
+                onClose();
+                navigate('/auth?mode=register');
+              } else {
+                onClose();
+                navigate(`/messages?business=${business.id}`);
+              }
+            }}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Contactar con {business.name}
+          </Button>
         </div>
 
         {/* Gallery */}

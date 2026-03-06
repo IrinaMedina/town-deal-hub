@@ -82,7 +82,7 @@ export default function MyBusiness() {
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
-    else if (!authLoading && role !== 'EMPRESA') navigate('/feed');
+    else if (!authLoading && role !== 'EMPRESA') navigate('/');
   }, [user, role, authLoading, navigate]);
 
   useEffect(() => {

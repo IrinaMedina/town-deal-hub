@@ -101,6 +101,7 @@ export type Database = {
           schedule: string | null
           social_media: Json | null
           town: string
+          trial_ends_at: string | null
           updated_at: string
           website: string | null
         }
@@ -120,6 +121,7 @@ export type Database = {
           schedule?: string | null
           social_media?: Json | null
           town: string
+          trial_ends_at?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -139,10 +141,52 @@ export type Database = {
           schedule?: string | null
           social_media?: Json | null
           town?: string
+          trial_ends_at?: string | null
           updated_at?: string
           website?: string | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          business_id: string
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          business_id: string
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          business_id?: string
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       offers: {
         Row: {
