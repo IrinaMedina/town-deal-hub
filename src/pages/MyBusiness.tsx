@@ -285,10 +285,27 @@ export default function MyBusiness() {
               {business ? 'Edita la información de tu establecimiento' : 'Completa los datos de tu negocio para aparecer en el directorio'}
             </CardDescription>
             {business && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                {business.rating_avg.toFixed(1)} ({business.rating_count} valoraciones)
-              </div>
+              <>
+                {(business as any).status === 'pending' && (
+                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm text-amber-800 dark:text-amber-200">
+                    ⏳ Tu empresa está pendiente de aprobación por el administrador
+                  </div>
+                )}
+                {(business as any).status === 'rejected' && (
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
+                    ❌ Tu empresa ha sido rechazada. Contacta con soporte para más información.
+                  </div>
+                )}
+                {(business as any).status === 'approved' && (
+                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-3 text-sm text-green-800 dark:text-green-200">
+                    ✅ Tu empresa está visible en el directorio
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  {business.rating_avg.toFixed(1)} ({business.rating_count} valoraciones)
+                </div>
+              </>
             )}
           </CardHeader>
 
