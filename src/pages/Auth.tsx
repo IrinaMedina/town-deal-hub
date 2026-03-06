@@ -210,10 +210,7 @@ export default function Auth() {
                         👤 Usuario - Busco empresas y servicios
                       </SelectItem>
                       <SelectItem value="EMPRESA">
-                        🏢 Empresa - Publicito mi negocio
-                      </SelectItem>
-                      <SelectItem value="PUBLICADOR">
-                        🏪 Tienda - Publico artículos y ofertas
+                        🏢 Empresa - Quiero aparecer en el directorio
                       </SelectItem>
                     </SelectContent>
                   </Select>

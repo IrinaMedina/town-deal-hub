@@ -51,8 +51,8 @@ export default function Publish() {
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
-    } else if (!authLoading && role !== 'PUBLICADOR') {
-      navigate('/feed');
+    } else if (!authLoading && role !== 'PUBLICADOR' && role !== 'EMPRESA') {
+      navigate('/');
     }
   }, [user, role, authLoading, navigate]);
 
