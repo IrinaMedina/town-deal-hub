@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Loader2, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Captcha } from '@/components/Captcha';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,6 +32,7 @@ export function ReservationDialog({ offer, open, onOpenChange }: ReservationDial
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,6 +148,11 @@ export function ReservationDialog({ offer, open, onOpenChange }: ReservationDial
             </div>
           </div>
           
+          <div className="space-y-2">
+            <Label>Verificación de seguridad</Label>
+            <Captcha onVerified={setCaptchaVerified} />
+          </div>
+          
           <DialogFooter>
             <Button
               type="button"
@@ -155,7 +162,7 @@ export function ReservationDialog({ offer, open, onOpenChange }: ReservationDial
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || !captchaVerified}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />

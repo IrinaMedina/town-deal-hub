@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Tag, Loader2 } from 'lucide-react';
 import { z } from 'zod';
+import { Captcha } from '@/components/Captcha';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -33,6 +34,7 @@ export default function Auth() {
     role: '' as 'PUBLICADOR' | 'SUSCRIPTOR' | '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   const { signUp, signIn, user, role } = useAuth();
   const navigate = useNavigate();
@@ -247,7 +249,12 @@ export default function Auth() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <div className="space-y-2">
+              <Label>Verificación de seguridad</Label>
+              <Captcha onVerified={setCaptchaVerified} />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading || !captchaVerified}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
